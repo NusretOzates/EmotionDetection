@@ -1,0 +1,6 @@
+# Project exclude paths
+data/
+venv/
+data.7z
+test_pictures/
+model_weights/
