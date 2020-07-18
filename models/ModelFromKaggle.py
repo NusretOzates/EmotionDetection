@@ -13,6 +13,7 @@ class KaggleModel:
 
             Conv2D(32, (3, 3), activation='relu', input_shape=(160, 160, 3)),
             Conv2D(32, (3, 3), activation='relu', padding='same'),
+
             MaxPooling2D(pool_size=(2, 2)),
 
             Conv2D(64, (3, 3), activation='relu', padding='same'),

@@ -13,11 +13,11 @@ class Resnet50:
 
         self.net = tf.keras.applications.ResNet50V2(input_shape=(target_size, target_size, 3),
                                                     include_top=False,
-                                                    weights='imagenet'
+
                                                     )
         self.net.trainable = True
         # Fine tune from this layer onwards
-        fine_tune_at = 60
+        fine_tune_at = 70
 
         # Freeze all the layers before the `fine_tune_at` layer
         for layer in self.net.layers[:fine_tune_at]:
@@ -26,13 +26,15 @@ class Resnet50:
         self.model = tf.keras.Sequential([
             self.net,
             Flatten(),
+            Dropout(0.3),
+            Dense(512, activation='relu'),
             tf.keras.layers.Dense(7, activation='softmax')
         ])
 
-       # self.model.load_weights(self.checkpoint_path)
+        self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer='adamax',
+                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
                            metrics=['accuracy'],
                            )
 
@@ -40,12 +42,14 @@ class Resnet50:
         # Create a callback that saves the model's weights
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                          save_weights_only=True,
-                                                         save_best_only=True,
                                                          verbose=0)
+
+        log_dir = "logs/fit/resnet50"
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
         history = self.model.fit(x=train_dataset,
                                  validation_data=validation_dataset,
                                  epochs=epochs,
                                  verbose=1,
-                                 callbacks=[cp_callback]
+                                 callbacks=[cp_callback, tensorboard_callback]
                                  )
         return history

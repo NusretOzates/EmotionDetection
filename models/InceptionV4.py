@@ -16,7 +16,7 @@ class InceptionV4:
                                                            )
         self.net.trainable = True
         # Fine tune from this layer onwards
-        fine_tune_at = 80
+        fine_tune_at = 100
 
         # Freeze all the layers before the `fine_tune_at` layer
         for layer in self.net.layers[:fine_tune_at]:
@@ -25,10 +25,12 @@ class InceptionV4:
         self.model = tf.keras.Sequential([
             self.net,
             Flatten(),
+            Dropout(0.3),
+            Dense(512, activation='relu'),
             tf.keras.layers.Dense(7, activation='softmax')
         ])
 
-        # self.model.load_weights(self.checkpoint_path)
+        self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
                            optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0005),
@@ -41,11 +43,14 @@ class InceptionV4:
                                                          save_weights_only=True,
                                                          save_best_only=True,
                                                          verbose=0)
+
+        log_dir = "logs/fit/inception"
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
         history = self.model.fit(x=train_dataset,
                                  validation_data=validation_dataset,
                                  epochs=epochs,
                                  verbose=1,
-                                 callbacks=[cp_callback]
+                                 callbacks=[cp_callback, tensorboard_callback]
                                  )
         return history
 

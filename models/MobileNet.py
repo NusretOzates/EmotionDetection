@@ -3,6 +3,7 @@ import os
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import *
+from tensorflow.python.keras.regularizers import l2
 
 
 class MobileNet:
@@ -16,26 +17,27 @@ class MobileNet:
                                                      include_top=False,
                                                      weights='imagenet'
                                                      )
-        self.net.trainable = False
+        self.net.trainable = True
         # Fine tune from this layer onwards
-        fine_tune_at = 50
-
+        fine_tune_at = 80
 
         # Freeze all the layers before the `fine_tune_at` layer
-        for layer in self.net.layers[:fine_tune_at]:
+        for layer in self.net.layers[:-fine_tune_at]:
             layer.trainable = False
 
         last_layer = self.net.get_layer('out_relu')
         last_output = last_layer.output
         x = Flatten()(last_output)
+        x = Dropout(0.3)(x)
+        x = Dense(512, activation='relu', kernel_regularizer=l2(l=0.001))(x)
         x = Dense(7, activation='softmax')(x)
 
         self.model = Model(self.net.input, x)
 
-#        self.model.load_weights(self.checkpoint_path)
+        self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer='adamax',
+                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
                            metrics=['accuracy'],
                            )
 
@@ -47,10 +49,12 @@ class MobileNet:
                                                          save_weights_only=True,
                                                          save_best_only=False,
                                                          verbose=0)
+        log_dir = "logs/fit/mobilenet"
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
         history = self.model.fit(x=train_dataset,
                                  validation_data=validation_dataset,
                                  epochs=epochs,
                                  verbose=2,
-                                 callbacks=[cp_callback]
+                                 callbacks=[cp_callback, tensorboard_callback]
                                  )
         return history

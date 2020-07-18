@@ -24,13 +24,15 @@ class XCeption:
         self.model = tf.keras.Sequential([
             self.net,
             Flatten(),
+            Dropout(0.3),
+            Dense(512, activation='relu'),
             tf.keras.layers.Dense(7, activation='softmax')
         ])
 
-       # self.model.load_weights(self.checkpoint_path)
+        self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.005),
+                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0005),
                            metrics=['accuracy'],
                            )
 
@@ -39,11 +41,15 @@ class XCeption:
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                          save_weights_only=True,
                                                          verbose=0)
+
+        log_dir = "logs/fit/xception"
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
         history = self.model.fit(x=train_dataset,
                                  validation_data=validation_dataset,
                                  epochs=epochs,
                                  verbose=1,
-                                 callbacks=[cp_callback]
+                                 callbacks=[cp_callback, tensorboard_callback]
                                  )
         return history
 

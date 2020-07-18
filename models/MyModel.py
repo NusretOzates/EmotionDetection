@@ -37,7 +37,7 @@ class MyModel:
 
         self.model.add(Dense(num_classes, activation='softmax'))
 
-        #self.model.load_weights(self.checkpoint_path)
+        self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
                            optimizer='adamax',
@@ -50,10 +50,13 @@ class MyModel:
                                                          save_weights_only=True,
                                                          save_best_only=True,
                                                          verbose=0)
+        log_dir = "logs/fit/mymodel"
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
         history = self.model.fit(x=train_dataset,
                                  validation_data=validation_dataset,
                                  epochs=epochs,
                                  verbose=1,
-                                 callbacks=[cp_callback]
+                                 callbacks=[cp_callback, tensorboard_callback]
                                  )
         return history
