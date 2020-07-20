@@ -18,12 +18,12 @@ class MobileNet:
                                                      weights='imagenet'
                                                      )
         self.net.trainable = True
-        # Fine tune from this layer onwards
-        fine_tune_at = 80
-
-        # Freeze all the layers before the `fine_tune_at` layer
-        for layer in self.net.layers[:-fine_tune_at]:
-            layer.trainable = False
+        # # Fine tune from this layer onwards
+        # fine_tune_at = 80
+        #
+        # # Freeze all the layers before the `fine_tune_at` layer
+        # for layer in self.net.layers[:-fine_tune_at]:
+        #     layer.trainable = False
 
         last_layer = self.net.get_layer('out_relu')
         last_output = last_layer.output

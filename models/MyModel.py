@@ -40,7 +40,7 @@ class MyModel:
         self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer='adamax',
+                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
                            metrics=['accuracy'],
                            )
 

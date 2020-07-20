@@ -4,7 +4,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 
 def train_model(model, name, train_data, val_data):
-    epochs = 25
+    epochs = 15
 
     history = model.train(
         epochs=epochs,
@@ -19,14 +19,14 @@ def train_model(model, name, train_data, val_data):
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
     plt.show()
-    # summarize history for loss
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title(name + ' model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
+    # # summarize history for loss
+    # plt.plot(history.history['loss'])
+    # plt.plot(history.history['val_loss'])
+    # plt.title(name + ' model loss')
+    # plt.ylabel('loss')
+    # plt.xlabel('epoch')
+    # plt.legend(['train', 'test'], loc='upper left')
+    # plt.show()
 
 
 def generate_train_dev_test(target_size):
@@ -50,7 +50,7 @@ def generate_train_dev_test(target_size):
     train = datagen.flow_from_directory(
         'data/train',
         target_size=(target_size, target_size),
-        batch_size=32,
+        batch_size=16,
         subset='training',
         class_mode='categorical',
         interpolation='hamming'
@@ -59,7 +59,7 @@ def generate_train_dev_test(target_size):
     val = datagen.flow_from_directory(
         'data/train',
         target_size=(target_size, target_size),
-        batch_size=32,
+        batch_size=16,
         subset='validation',
         class_mode='categorical',
         interpolation='hamming'
@@ -68,7 +68,7 @@ def generate_train_dev_test(target_size):
     test = datagen_dev.flow_from_directory(
         'data/dev',
         target_size=(197, 197),
-        batch_size=32,
+        batch_size=16,
         class_mode='categorical',
         shuffle=False
     )
@@ -126,15 +126,6 @@ def generate_generator_multiple(generator, subset, target_size):
         interpolation='hamming',
         seed=7
     )
-    genX6 = generator.flow_from_directory(
-        'data/train',
-        target_size=(target_size, target_size),
-        batch_size=16,
-        subset=subset,
-        class_mode='categorical',
-        interpolation='hamming',
-        seed=7
-    )
 
     while True:
         X1i = genX1.next()
@@ -142,9 +133,8 @@ def generate_generator_multiple(generator, subset, target_size):
         X3i = genX3.next()
         X4i = genX4.next()
         X5i = genX5.next()
-        X6i = genX5.next()
 
-        yield [X1i[0], X2i[0], X3i[0], X4i[0], X5i[0], X6i[0]], X2i[1]  # Yield both images and their mutual label
+        yield [X1i[0], X2i[0], X3i[0], X4i[0], X5i[0]], X2i[1]  # Yield both images and their mutual label
 
 
 def generate_test_generator_multiple(generator, target_size):
@@ -191,24 +181,14 @@ def generate_test_generator_multiple(generator, target_size):
         seed=7
     )
 
-    genX6 = generator.flow_from_directory(
-        'data/dev',
-        target_size=(target_size, target_size),
-        batch_size=16,
-        class_mode='categorical',
-        interpolation='hamming',
-        seed=7
-    )
-
     while True:
         X1i = genX1.next()
         X2i = genX2.next()
         X3i = genX3.next()
         X4i = genX4.next()
         X5i = genX5.next()
-        X6i = genX5.next()
 
-        yield [X1i[0], X2i[0], X3i[0], X4i[0], X5i[0], X6i[0]], X2i[1]  # Yield both images and their mutual label
+        yield [X1i[0], X2i[0], X3i[0], X4i[0], X5i[0]], X2i[1]  # Yield both images and their mutual label
 
 
 def generateLabels(train):

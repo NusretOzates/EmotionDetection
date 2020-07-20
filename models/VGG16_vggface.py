@@ -12,41 +12,33 @@ class VGG16_VGGFACE:
         self.checkpoint_path = "model_weights/vgg16_vggface_training_1/cp.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
         DROPOUT_RATE = 0.3
-        print(target_size)
-        self.net = VGGFace(input_shape=(target_size, target_size, 3),
-                           include_top=False,
-                           model='vgg16'
-                           )
+        FROZEN_LAYER_NUM = 19
+        vgg_notop = VGGFace(model='vgg16', include_top=False, input_shape=(target_size, target_size, 3),
+                            pooling='avg')
+        print(vgg_notop.summary())
+        last_layer = vgg_notop.get_layer('pool5').output
+        x = Flatten(name='flatten')(last_layer)
+        x = Dropout(DROPOUT_RATE)(x)
+        x = Dense(4096, activation='relu', name='fc6')(x)
+        x = Dropout(DROPOUT_RATE)(x)
+        x = Dense(1024, activation='relu', name='fc7')(x)
 
-        self.net.trainable = True
-        # Fine tune from this layer onwards
-        fine_tune_at = 4
+        for i in range(FROZEN_LAYER_NUM):
+            vgg_notop.layers[i].trainable = False
 
-        # Freeze all the layers before the `fine_tune_at` layer
-        for layer in self.net.layers[:-fine_tune_at]:
-            layer.trainable = False
+        print(vgg_notop.get_layer('pool5').trainable)
 
-        last_layer = self.net.get_layer('pool5')
-        last_output = last_layer.output
+        out = Dense(7, activation='softmax', name='classifier')(x)
 
-        # %60 test accuracy in 40 epoch , 76*76 image
-        x = Flatten()(last_output)
-        x = Dense(7, activation='softmax')(x)
-
-        # %60 test accuracy in 40 epoch , 76*76 image
-        # x = GlobalAveragePooling2D()(last_output)
-        # x = Dense(7, activation='softmax')(x)
-
-        self.model = Model(self.net.input, x)
+        self.model = Model(vgg_notop.input, out)
 
         self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.005),
+                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
                            metrics=['accuracy'],
                            )
 
-        print(self.model.summary())
 
     def train(self, epochs, train_dataset, validation_dataset):
         # Create a callback that saves the model's weights

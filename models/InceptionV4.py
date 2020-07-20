@@ -33,7 +33,7 @@ class InceptionV4:
         self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0005),
+                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
                            metrics=['accuracy'],
                            )
 

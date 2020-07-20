@@ -3,6 +3,7 @@ import os
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import *
+from tensorflow.python.keras.regularizers import l2
 
 
 class Simple_ExpertNet:
@@ -20,26 +21,30 @@ class Simple_ExpertNet:
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
         input = Input(shape=(target_size, target_size, 3))
         x = Conv2D(32, (5, 5), activation='relu', padding='same')(input)
-        x = Conv2D(32, (3, 3), activation='relu', padding='same', strides=(2, 2))(x)
-        x = self.exFeat(x, 32)
-        x = Conv2D(64, 3, strides=(2, 2), padding='same', activation='relu')(x)
-        x = self.exFeat(x, 64)
-        x = Conv2D(96, 3, strides=(2, 2), activation='relu', padding='same')(x)
-        x = self.exFeat(x, 96)
-        x = Conv2D(128, 3, strides=(2, 2), activation='relu', padding='same')(x)
-        x = self.exFeat(x, 128)
+        c1 = Conv2D(32, (3, 3), activation='relu', padding='same', strides=(2, 2))(x)
+        x = self.exFeat(c1, 32)
+        x = Add()([c1, x])
+        c2 = Conv2D(64, 3, strides=(2, 2), padding='same', activation='relu')(x)
+        x = self.exFeat(c2, 64)
+        x = Add()([c2, x])
+        c3 = Conv2D(96, 3, strides=(2, 2), activation='relu', padding='same')(x)
+        x = self.exFeat(c3, 96)
+        x = Add()([c3, x])
+        c4 = Conv2D(128, 3, strides=(2, 2), activation='relu', padding='same')(x)
+        x = self.exFeat(c4, 128)
+        x = Add()([c4, x])
         x = Conv2D(184, kernel_size=3, activation='relu', strides=(2, 2))(x)
         x = Conv2D(256, kernel_size=3, activation='relu', strides=(2, 2))(x)
         x = Flatten()(x)
-        x = Dense(512, activation='relu')(x)
-        x = Dense(1024, activation='relu')(x)
+        x = Dense(512, activation='relu', kernel_regularizer=l2(l=0.001))(x)
+        x = Dense(1024, activation='relu', kernel_regularizer=l2(l=0.001))(x)
         output = Dense(7, activation='softmax')(x)
 
         self.model = Model(inputs=input, outputs=output)
         self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0005),
+                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
                            metrics=['accuracy'],
                            )
 

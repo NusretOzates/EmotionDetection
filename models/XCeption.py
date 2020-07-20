@@ -15,7 +15,7 @@ class XCeption:
 
         self.net.trainable = True
         # Fine tune from this layer onwards
-        fine_tune_at = 80
+        fine_tune_at = 30
 
         # Freeze all the layers before the `fine_tune_at` layer
         for layer in self.net.layers[:fine_tune_at]:

@@ -17,10 +17,10 @@ class Resnet50:
                                                     )
         self.net.trainable = True
         # Fine tune from this layer onwards
-        fine_tune_at = 70
+        fine_tune_at = 140
 
         # Freeze all the layers before the `fine_tune_at` layer
-        for layer in self.net.layers[:fine_tune_at]:
+        for layer in self.net.layers[:-fine_tune_at]:
             layer.trainable = False
 
         self.model = tf.keras.Sequential([
