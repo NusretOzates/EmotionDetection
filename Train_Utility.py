@@ -4,7 +4,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 
 def train_model(model, name, train_data, val_data):
-    epochs = 15
+    epochs = 40
 
     history = model.train(
         epochs=epochs,
@@ -80,7 +80,7 @@ def generate_generator_multiple(generator, subset, target_size):
     genX1 = generator.flow_from_directory(
         'data/train',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         subset=subset,
         class_mode='categorical',
         interpolation='hamming',
@@ -90,7 +90,7 @@ def generate_generator_multiple(generator, subset, target_size):
     genX2 = generator.flow_from_directory(
         'data/train',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         subset=subset,
         class_mode='categorical',
         interpolation='hamming',
@@ -100,7 +100,7 @@ def generate_generator_multiple(generator, subset, target_size):
     genX3 = generator.flow_from_directory(
         'data/train',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         subset=subset,
         class_mode='categorical',
         interpolation='hamming',
@@ -110,7 +110,7 @@ def generate_generator_multiple(generator, subset, target_size):
     genX4 = generator.flow_from_directory(
         'data/train',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         subset=subset,
         class_mode='categorical',
         interpolation='hamming',
@@ -120,7 +120,7 @@ def generate_generator_multiple(generator, subset, target_size):
     genX5 = generator.flow_from_directory(
         'data/train',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         subset=subset,
         class_mode='categorical',
         interpolation='hamming',
@@ -141,7 +141,7 @@ def generate_test_generator_multiple(generator, target_size):
     genX1 = generator.flow_from_directory(
         'data/dev',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
@@ -150,7 +150,7 @@ def generate_test_generator_multiple(generator, target_size):
     genX2 = generator.flow_from_directory(
         'data/dev',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
@@ -159,7 +159,7 @@ def generate_test_generator_multiple(generator, target_size):
     genX3 = generator.flow_from_directory(
         'data/dev',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
@@ -167,7 +167,7 @@ def generate_test_generator_multiple(generator, target_size):
     genX4 = generator.flow_from_directory(
         'data/dev',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
@@ -175,7 +175,7 @@ def generate_test_generator_multiple(generator, target_size):
     genX5 = generator.flow_from_directory(
         'data/dev',
         target_size=(target_size, target_size),
-        batch_size=16,
+        batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7

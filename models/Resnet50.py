@@ -27,7 +27,7 @@ class Resnet50:
             self.net,
             Flatten(),
             Dropout(0.3),
-            Dense(512, activation='relu'),
+            Dense(512, activation='relu', name='Last_Layer6'),
             tf.keras.layers.Dense(7, activation='softmax')
         ])
 

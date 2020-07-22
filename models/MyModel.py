@@ -6,7 +6,7 @@ from tensorflow.keras.layers import *
 
 class MyModel:
 
-    def __init__(self,target_size):
+    def __init__(self, target_size):
         self.checkpoint_path = "mymodel_training_1/cp.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
         num_classes = 7
@@ -32,7 +32,7 @@ class MyModel:
         # fully connected neural networks
         self.model.add(Dense(1024, activation='relu'))
         self.model.add(Dropout(0.2))
-        self.model.add(Dense(1024, activation='relu'))
+        self.model.add(Dense(1024, activation='relu', name='Last_Layer2'))
         self.model.add(Dropout(0.2))
 
         self.model.add(Dense(num_classes, activation='softmax'))

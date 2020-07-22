@@ -37,7 +37,7 @@ class Simple_ExpertNet:
         x = Conv2D(256, kernel_size=3, activation='relu', strides=(2, 2))(x)
         x = Flatten()(x)
         x = Dense(512, activation='relu', kernel_regularizer=l2(l=0.001))(x)
-        x = Dense(1024, activation='relu', kernel_regularizer=l2(l=0.001))(x)
+        x = Dense(1024, activation='relu', kernel_regularizer=l2(l=0.001), name='Last_Layer3')(x)
         output = Dense(7, activation='softmax')(x)
 
         self.model = Model(inputs=input, outputs=output)

@@ -11,28 +11,29 @@ from tensorflow.keras.layers import *
 # from deepface.basemodels import VGGFace, OpenFace, Facenet, FbDeepFace, DeepID
 
 
-class Resnet50_VGGFACE:
+class Senet50_VGGFACE:
 
     def __init__(self, target_size):
-        self.checkpoint_path = "model_weights/senet50_vggface_training_1/cp.ckpt"
+        # It is senet I know but there are some mistakes... It should stay like this!
+        self.checkpoint_path = "model_weights/resnet50_vggface_training_1/cp.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
 
         DROPOUT_RATE = 0.5
-        FROZEN_LAYER_NUM = 170
+        FROZEN_LAYER_NUM = 201
 
-        vgg_notop = VGGFace(model='resnet50', include_top=False, input_shape=(target_size, target_size, 3),
+        vgg_notop = VGGFace(model='senet50', include_top=False, input_shape=(target_size, target_size, 3),
                             pooling='avg')
         last_layer = vgg_notop.get_layer('avg_pool').output
         x = Flatten(name='flatten')(last_layer)
         x = Dropout(DROPOUT_RATE)(x)
         x = Dense(4096, activation='relu', name='fc6')(x)
         x = Dropout(DROPOUT_RATE)(x)
-        x = Dense(1024, activation='relu', name='Last_Layer')(x)
+        x = Dense(1024, activation='relu', name='Last_Layer12')(x)
         x = Dropout(DROPOUT_RATE)(x)
 
-        batch_norm_indices = [2, 6, 9, 13, 14, 18, 21, 24, 28, 31, 34, 38, 41, 45, 46, 53, 56, 60, 63, 66, 70, 73, 76,
-                              80, 83, 87, 88, 92, 95, 98, 102, 105, 108, 112, 115, 118, 122, 125, 128, 132, 135, 138,
-                              142, 145, 149, 150, 154, 157, 160, 164, 167, 170]
+        batch_norm_indices = [2, 6, 9, 12, 21, 25, 28, 31, 42, 45, 48, 59, 62, 65, 74, 78, 81, 84, 95, 98, 101, 112,
+                              115, 118, 129, 132, 135, 144, 148, 151, 154, 165, 168, 171, 182, 185, 188, 199, 202, 205,
+                              216, 219, 222, 233, 236, 239, 248, 252, 255, 258, 269, 272, 275]
         for i in range(FROZEN_LAYER_NUM):
             if i not in batch_norm_indices:
                 vgg_notop.layers[i].trainable = False

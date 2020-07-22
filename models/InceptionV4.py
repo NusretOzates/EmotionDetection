@@ -26,7 +26,7 @@ class InceptionV4:
             self.net,
             Flatten(),
             Dropout(0.3),
-            Dense(512, activation='relu'),
+            Dense(512, activation='relu', name='Last_Layer5'),
             tf.keras.layers.Dense(7, activation='softmax')
         ])
 

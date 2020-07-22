@@ -15,7 +15,6 @@ class VGG16_VGGFACE:
         FROZEN_LAYER_NUM = 19
         vgg_notop = VGGFace(model='vgg16', include_top=False, input_shape=(target_size, target_size, 3),
                             pooling='avg')
-        print(vgg_notop.summary())
         last_layer = vgg_notop.get_layer('pool5').output
         x = Flatten(name='flatten')(last_layer)
         x = Dropout(DROPOUT_RATE)(x)
@@ -26,7 +25,6 @@ class VGG16_VGGFACE:
         for i in range(FROZEN_LAYER_NUM):
             vgg_notop.layers[i].trainable = False
 
-        print(vgg_notop.get_layer('pool5').trainable)
 
         out = Dense(7, activation='softmax', name='classifier')(x)
 

@@ -4,9 +4,9 @@ import tensorflow as tf
 from tensorflow.keras.layers import *
 
 from models.InceptionV4 import InceptionV4
-from models.MyModel import MyModel
 from models.Resnet50 import Resnet50
-from models.Simple_ExpertNet import Simple_ExpertNet
+from models.Resnet50_vggface import Resnet50_VGGFACE
+from models.Senet50_vggface import Senet50_VGGFACE
 from models.XCeption import XCeption
 
 
@@ -18,26 +18,37 @@ class EnsembleModel:
 
         inception = InceptionV4(target_size).model
         resnet50 = Resnet50(target_size).model
-        mymodel = MyModel(target_size).model
+        senet50 = Senet50_VGGFACE(target_size).model
         xception = XCeption(target_size).model
-        expert = Simple_ExpertNet(target_size).model
+        resnet_vgg = Resnet50_VGGFACE(target_size).model
 
         inception.trainable = False
         resnet50.trainable = False
-        mymodel.trainable = False
+        senet50.trainable = False
         xception.trainable = False
-        expert.trainable = False
+        resnet_vgg.trainable = False
+
+        inception_output = inception.get_layer('Last_Layer5').output
+        resnet50_output = resnet50.get_layer('Last_Layer6').output
+        mymodel_output = senet50.get_layer('Last_Layer12').output
+        xception_output = xception.get_layer('Last_Layer7').output
+        expert_output = resnet_vgg.get_layer('Last_Layer').output
+
+        models = [inception, resnet50, senet50, xception, resnet_vgg]
+
+        i = 0
+        for model in models:
+            for layer in model.layers:
+                layer._name = layer._name + str(i)
+                i += 1
 
         input_layer = concatenate(
-            [inception.output, resnet50.output, mymodel.output, xception.output, expert.output])
-        dense_out = Dense(128, activation='relu')(input_layer)
-        dense_out = Dropout(0.3)(dense_out)
-        dense_out = Dense(128, activation='relu')(dense_out)
-        dense_out = Dropout(0.3)(dense_out)
-        pred = Dense(7, activation='softmax')(dense_out)
+            [inception_output, resnet50_output, mymodel_output, xception_output, expert_output])
+
+        pred = Dense(7, activation='softmax')(input_layer)
 
         self.model = tf.keras.models.Model(
-            inputs=[inception.input, resnet50.input, mymodel.input, xception.input, expert.input]
+            inputs=[inception.input, resnet50.input, senet50.input, xception.input, resnet_vgg.input]
             , outputs=pred
         )
 
@@ -56,9 +67,9 @@ class EnsembleModel:
                                                          verbose=0)
 
         history = self.model.fit(x=train_dataset,
-                                 steps_per_epoch=30134 / 16,
+                                 steps_per_epoch=30134 / 8,
                                  validation_data=validation_dataset,
-                                 validation_steps=3345 / 16,
+                                 validation_steps=3345 / 8,
                                  epochs=epochs,
                                  verbose=1,
                                  callbacks=[cp_callback]

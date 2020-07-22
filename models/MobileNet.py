@@ -29,7 +29,7 @@ class MobileNet:
         last_output = last_layer.output
         x = Flatten()(last_output)
         x = Dropout(0.3)(x)
-        x = Dense(512, activation='relu', kernel_regularizer=l2(l=0.001))(x)
+        x = Dense(512, activation='relu', kernel_regularizer=l2(l=0.001), name='Last_Layer4')(x)
         x = Dense(7, activation='softmax')(x)
 
         self.model = Model(self.net.input, x)
