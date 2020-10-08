@@ -54,10 +54,13 @@ class Simple_ExpertNet:
                                                          save_weights_only=True,
                                                          save_best_only=True,
                                                          verbose=0)
+        log_dir = "logs/fit/expertnet"
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
         history = self.model.fit(x=train_dataset,
                                  validation_data=validation_dataset,
                                  epochs=epochs,
                                  verbose=1,
-                                 callbacks=[cp_callback]
+                                 callbacks=[cp_callback, tensorboard_callback]
                                  )
         return history

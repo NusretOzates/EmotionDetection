@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.metrics import accuracy_score
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
+from Train_Utility import generate_train_dev_test
 from models.InceptionV4 import *
 from models.MobileNet import *
 from models.MyModel import MyModel
@@ -18,43 +18,44 @@ session = tf.compat.v1.InteractiveSession(config=config)
 
 emotion_labels = ["Angry", "Disgust", "Fear", "Happy", "Neutral", "Sad", "Surprise"]
 
-datagen_test = ImageDataGenerator(
-    rescale=1 / 255,
+from tensorflow.keras.applications import mobilenet_v2
+from tensorflow.keras.applications import inception_resnet_v2
+from tensorflow.keras.applications import resnet_v2
+from tensorflow.keras.applications import xception
 
-)
-
+target_size = 197
 targetsize = 197
-
-test = datagen_test.flow_from_directory(
-    'data/dev',
-    target_size=(targetsize, targetsize),
-    batch_size=8,
-    class_mode='categorical',
-    shuffle=False,
-    interpolation='hamming'
-)
-
-yhats = np.zeros((6, len(test.filenames), 7))
-print(yhats.shape)
 
 resnet_vgg = Resnet50_VGGFACE(targetsize).model
 senet_vgg = Senet50_VGGFACE(targetsize).model
 mobilenet = MobileNet(targetsize).model
 inception = InceptionV4(targetsize).model
 resnet50 = Resnet50(targetsize).model
-xception = XCeption(targetsize).model
+xception_model = XCeption(targetsize).model
 expert = Simple_ExpertNet(targetsize).model
 mymodel = MyModel(targetsize).model
 vgg16 = VGG16_VGGFACE(targetsize).model
 
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, mobilenet_v2.preprocess_input, 8)
 mobiley = mobilenet.predict(test)
+
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, inception_resnet_v2.preprocess_input, 8)
 inceptiony = inception.predict(test)
+
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, resnet_v2.preprocess_input, 8)
 resnet50y = resnet50.predict(test)
-xceptiony = xception.predict(test)
+
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, xception.preprocess_input, 8)
+xceptiony = xception_model.predict(test)
+
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, batch_size=8)
 experty = expert.predict(test)
 vgg16y = vgg16.predict(test)
 resnet_vggy = resnet_vgg.predict(test)
 senet_vggy = senet_vgg.predict(test)
+
+yhats = np.zeros((6, len(test.filenames), 7))
+print(yhats.shape)
 
 yhats[0, :, :] = senet_vggy
 yhats[1, :, :] = xceptiony
@@ -69,18 +70,23 @@ yhats[5, :, :] = inceptiony
 summed = np.sum(yhats, axis=0)
 result = np.argmax(summed, axis=1)
 
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, mobilenet_v2.preprocess_input, 8)
 print('MobileNet Accuracy score is coming!')
 mobilenet.evaluate(test)
 
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, inception_resnet_v2.preprocess_input, 8)
 print('Inception Accuracy score is coming!')
 inception.evaluate(test)
 
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, resnet_v2.preprocess_input, 8)
 print('Resnet Accuracy score is coming!')
 resnet50.evaluate(test)
 
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, xception.preprocess_input, 8)
 print('Xception Accuracy score is coming!')
-xception.evaluate(test)
+xception_model.evaluate(test)
 
+train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, batch_size=8)
 print('My Model Accuracy score is coming!')
 mymodel.evaluate(test)
 

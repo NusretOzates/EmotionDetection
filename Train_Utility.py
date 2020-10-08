@@ -2,10 +2,10 @@ import tensorflow as tf
 from matplotlib import pyplot as plt
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
+DATA_TEST = 'data/test'
 
-def train_model(model, name, train_data, val_data):
-    epochs = 40
 
+def train_model(model, name, train_data, val_data, epochs=10):
     history = model.train(
         epochs=epochs,
         train_dataset=train_data,
@@ -19,113 +19,180 @@ def train_model(model, name, train_data, val_data):
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
     plt.show()
-    # # summarize history for loss
-    # plt.plot(history.history['loss'])
-    # plt.plot(history.history['val_loss'])
-    # plt.title(name + ' model loss')
-    # plt.ylabel('loss')
-    # plt.xlabel('epoch')
-    # plt.legend(['train', 'test'], loc='upper left')
-    # plt.show()
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title(name + ' model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
 
 
-def generate_train_dev_test(target_size):
-    datagen = ImageDataGenerator(
-        rescale=1 / 255,
-        rotation_range=20,
-        zoom_range=0.2,
-        shear_range=0.3,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        horizontal_flip=True,
-        vertical_flip=False,
-        fill_mode='nearest',
-        validation_split=0.1
-    )
+def generate_train_dev_test(target_size, preprocessing_function=None, batch_size=16):
+    data_val = 'data/val'
+    data_train = 'data/train'
+    if preprocessing_function is not None:
+        datagen = ImageDataGenerator(
+            rotation_range=20,
+            zoom_range=0.2,
+            shear_range=0.3,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            horizontal_flip=True,
+            vertical_flip=False,
+            fill_mode='nearest',
+            preprocessing_function=preprocessing_function
+        )
 
-    datagen_dev = ImageDataGenerator(
-        rescale=1 / 255,
-    )
+        datagen_dev = ImageDataGenerator(
+            preprocessing_function=preprocessing_function
+        )
 
+        datagen_test = ImageDataGenerator(
+            preprocessing_function=preprocessing_function
+        )
+
+        return get_data(batch_size, data_train, data_val, datagen, datagen_dev, datagen_test, target_size)
+    else:
+
+        datagen = ImageDataGenerator(
+            rotation_range=20,
+            zoom_range=0.2,
+            shear_range=0.3,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            horizontal_flip=True,
+            vertical_flip=False,
+            fill_mode='nearest',
+            rescale=1.0 / 255
+        )
+
+        datagen_dev = ImageDataGenerator(
+            rescale=1.0 / 255
+        )
+
+        datagen_test = ImageDataGenerator(
+            rescale=1.0 / 255
+        )
+
+        return get_data(batch_size, data_train, data_val, datagen, datagen_dev, datagen_test, target_size)
+
+
+def get_data(batch_size, data_train, data_val, datagen, datagen_dev, datagen_test, target_size):
     train = datagen.flow_from_directory(
-        'data/train',
+        data_train,
         target_size=(target_size, target_size),
-        batch_size=16,
-        subset='training',
+        batch_size=batch_size,
         class_mode='categorical',
-        interpolation='hamming'
-    )
-
-    val = datagen.flow_from_directory(
-        'data/train',
-        target_size=(target_size, target_size),
-        batch_size=16,
-        subset='validation',
-        class_mode='categorical',
-        interpolation='hamming'
-    )
-
-    test = datagen_dev.flow_from_directory(
-        'data/dev',
-        target_size=(197, 197),
-        batch_size=16,
-        class_mode='categorical',
+        interpolation='hamming',
         shuffle=False
     )
-
+    val = datagen_dev.flow_from_directory(
+        data_val,
+        target_size=(target_size, target_size),
+        batch_size=batch_size,
+        class_mode='categorical',
+        interpolation='hamming',
+        shuffle=False
+    )
+    test = datagen_test.flow_from_directory(
+        DATA_TEST,
+        target_size=(target_size, target_size),
+        batch_size=batch_size,
+        class_mode='categorical',
+        shuffle=False,
+        interpolation='hamming',
+    )
     return train, val, test, datagen, datagen_dev
 
 
-def generate_generator_multiple(generator, subset, target_size):
-    genX1 = generator.flow_from_directory(
+def train_dev_test(target_size, batch_size=16):
+    train_ds = tf.keras.preprocessing.image_dataset_from_directory(
         'data/train',
-        target_size=(target_size, target_size),
-        batch_size=8,
-        subset=subset,
-        class_mode='categorical',
-        interpolation='hamming',
-        seed=7
-    )
+        label_mode='categorical',
+        seed=123,
+        image_size=(target_size, target_size),
+        batch_size=batch_size)
 
-    genX2 = generator.flow_from_directory(
-        'data/train',
-        target_size=(target_size, target_size),
-        batch_size=8,
-        subset=subset,
-        class_mode='categorical',
-        interpolation='hamming',
-        seed=7
-    )
+    val_ds = tf.keras.preprocessing.image_dataset_from_directory(
+        'data/val',
+        label_mode='categorical',
+        seed=123,
+        image_size=(target_size, target_size),
+        batch_size=batch_size)
 
-    genX3 = generator.flow_from_directory(
-        'data/train',
-        target_size=(target_size, target_size),
-        batch_size=8,
-        subset=subset,
-        class_mode='categorical',
-        interpolation='hamming',
-        seed=7
-    )
+    test_ds = tf.keras.preprocessing.image_dataset_from_directory(
+        'data/test',
+        label_mode='categorical',
+        seed=123,
+        image_size=(target_size, target_size),
+        batch_size=batch_size)
 
-    genX4 = generator.flow_from_directory(
-        'data/train',
-        target_size=(target_size, target_size),
-        batch_size=8,
-        subset=subset,
-        class_mode='categorical',
-        interpolation='hamming',
-        seed=7
-    )
+    class_names = train_ds.class_names
+    print(class_names)
 
-    genX5 = generator.flow_from_directory(
-        'data/train',
+    AUTOTUNE = tf.data.experimental.AUTOTUNE
+
+    # # Use it when you have more RAM
+    # train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
+    # val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+    # test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
+
+    train_ds = train_ds.prefetch(buffer_size=AUTOTUNE)
+    val_ds = val_ds.prefetch(buffer_size=AUTOTUNE)
+    test_ds = test_ds.prefetch(buffer_size=AUTOTUNE)
+
+    return train_ds, val_ds, test_ds
+
+
+def generate_generator_multiple(subset, target_size):
+    AUTOTUNE = tf.data.experimental.AUTOTUNE
+
+    genX1 = tf.keras.preprocessing.image_dataset_from_directory(
+        'data/' + subset,
         target_size=(target_size, target_size),
         batch_size=8,
-        subset=subset,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
-    )
+    ).prefetch(buffer_size=AUTOTUNE)
+
+    genX2 = tf.keras.preprocessing.image_dataset_from_directory(
+        'data/' + subset,
+        target_size=(target_size, target_size),
+        batch_size=8,
+        class_mode='categorical',
+        interpolation='hamming',
+        seed=7
+    ).prefetch(buffer_size=AUTOTUNE)
+
+    genX3 = tf.keras.preprocessing.image_dataset_from_directory(
+        'data/' + subset,
+        target_size=(target_size, target_size),
+        batch_size=8,
+        class_mode='categorical',
+        interpolation='hamming',
+        seed=7
+    ).prefetch(buffer_size=AUTOTUNE)
+
+    genX4 = tf.keras.preprocessing.image_dataset_from_directory(
+        'data/' + subset,
+        target_size=(target_size, target_size),
+        batch_size=8,
+        class_mode='categorical',
+        interpolation='hamming',
+        seed=7
+    ).prefetch(buffer_size=AUTOTUNE)
+
+    genX5 = tf.keras.preprocessing.image_dataset_from_directory(
+        'data/' + subset,
+        target_size=(target_size, target_size),
+        batch_size=8,
+        class_mode='categorical',
+        interpolation='hamming',
+        seed=7
+    ).prefetch(buffer_size=AUTOTUNE)
 
     while True:
         X1i = genX1.next()
@@ -137,49 +204,50 @@ def generate_generator_multiple(generator, subset, target_size):
         yield [X1i[0], X2i[0], X3i[0], X4i[0], X5i[0]], X2i[1]  # Yield both images and their mutual label
 
 
-def generate_test_generator_multiple(generator, target_size):
-    genX1 = generator.flow_from_directory(
-        'data/dev',
+def generate_test_generator_multiple(target_size):
+    AUTOTUNE = tf.data.experimental.AUTOTUNE
+    genX1 = tf.keras.preprocessing.image_dataset_from_directory(
+        DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
-    )
+    ).prefetch(buffer_size=AUTOTUNE)
 
-    genX2 = generator.flow_from_directory(
-        'data/dev',
+    genX2 = tf.keras.preprocessing.image_dataset_from_directory(
+        DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
-    )
+    ).prefetch(buffer_size=AUTOTUNE)
 
-    genX3 = generator.flow_from_directory(
-        'data/dev',
+    genX3 = tf.keras.preprocessing.image_dataset_from_directory(
+        DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
-    )
-    genX4 = generator.flow_from_directory(
-        'data/dev',
+    ).prefetch(buffer_size=AUTOTUNE)
+    genX4 = tf.keras.preprocessing.image_dataset_from_directory(
+        DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
-    )
-    genX5 = generator.flow_from_directory(
-        'data/dev',
+    ).prefetch(buffer_size=AUTOTUNE)
+    genX5 = tf.keras.preprocessing.image_dataset_from_directory(
+        DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
         class_mode='categorical',
         interpolation='hamming',
         seed=7
-    )
+    ).prefetch(buffer_size=AUTOTUNE)
 
     while True:
         X1i = genX1.next()
@@ -191,7 +259,7 @@ def generate_test_generator_multiple(generator, target_size):
         yield [X1i[0], X2i[0], X3i[0], X4i[0], X5i[0]], X2i[1]  # Yield both images and their mutual label
 
 
-def generateLabels(train):
+def generat_labels(train):
     labels = '\n'.join(sorted(train.class_indices.keys()))
 
     with open('labels.txt', 'w') as f:
@@ -201,4 +269,4 @@ def generateLabels(train):
 def fix_gpu():
     config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True
-    session = tf.compat.v1.InteractiveSession(config=config)
+    tf.compat.v1.InteractiveSession(config=config)

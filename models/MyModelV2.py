@@ -9,6 +9,7 @@ class MyModelV2:
     def __init__(self):
         self.checkpoint_path = "mymodelV2_training_1/cp.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
+
         self.model = tf.keras.Sequential([
             Conv2D(64, (3, 3), activation='elu', padding='same', input_shape=(160, 160, 3)),
             BatchNormalization(),

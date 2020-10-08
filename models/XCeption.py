@@ -15,7 +15,7 @@ class XCeption:
 
         self.net.trainable = True
         # Fine tune from this layer onwards
-        fine_tune_at = 30
+        fine_tune_at = 65
 
         # Freeze all the layers before the `fine_tune_at` layer
         for layer in self.net.layers[:fine_tune_at]:
@@ -29,10 +29,10 @@ class XCeption:
             tf.keras.layers.Dense(7, activation='softmax')
         ])
 
-        self.model.load_weights(self.checkpoint_path)
+        # self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0005),
+                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
                            metrics=['accuracy'],
                            )
 
@@ -40,6 +40,7 @@ class XCeption:
         # Create a callback that saves the model's weights
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                          save_weights_only=True,
+                                                         save_best_only=True,
                                                          verbose=0)
 
         log_dir = "logs/fit/xception"

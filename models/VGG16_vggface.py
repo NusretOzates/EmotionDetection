@@ -12,7 +12,7 @@ class VGG16_VGGFACE:
         self.checkpoint_path = "model_weights/vgg16_vggface_training_1/cp.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
         DROPOUT_RATE = 0.3
-        FROZEN_LAYER_NUM = 19
+        FROZEN_LAYER_NUM = 14
         vgg_notop = VGGFace(model='vgg16', include_top=False, input_shape=(target_size, target_size, 3),
                             pooling='avg')
         last_layer = vgg_notop.get_layer('pool5').output
@@ -25,7 +25,6 @@ class VGG16_VGGFACE:
         for i in range(FROZEN_LAYER_NUM):
             vgg_notop.layers[i].trainable = False
 
-
         out = Dense(7, activation='softmax', name='classifier')(x)
 
         self.model = Model(vgg_notop.input, out)
@@ -37,18 +36,20 @@ class VGG16_VGGFACE:
                            metrics=['accuracy'],
                            )
 
-
     def train(self, epochs, train_dataset, validation_dataset):
         # Create a callback that saves the model's weights
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                          save_weights_only=True,
-                                                         save_best_only=False,
+                                                         save_best_only=True,
                                                          verbose=0)
+        log_dir = "logs/fit/vgg16_vgg"
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
         history = self.model.fit(x=train_dataset,
                                  validation_data=validation_dataset,
                                  epochs=epochs,
                                  verbose=1,
-                                 callbacks=[cp_callback]
+                                 callbacks=[cp_callback, tensorboard_callback]
                                  )
         return history
 

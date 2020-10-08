@@ -2,6 +2,7 @@ import os
 
 import tensorflow as tf
 from tensorflow.keras.layers import *
+from tensorflow.python.keras.regularizers import l2
 
 
 class MyModel:
@@ -30,17 +31,17 @@ class MyModel:
         self.model.add(Flatten())
 
         # fully connected neural networks
-        self.model.add(Dense(1024, activation='relu'))
-        self.model.add(Dropout(0.2))
-        self.model.add(Dense(1024, activation='relu', name='Last_Layer2'))
-        self.model.add(Dropout(0.2))
+        self.model.add(Dense(1024, activation='relu', kernel_regularizer=l2(l=0.0001)))
+        self.model.add(Dropout(0.4))
+        self.model.add(Dense(1024, activation='relu', name='Last_Layer2', kernel_regularizer=l2(l=0.0001)))
+        self.model.add(Dropout(0.4))
 
         self.model.add(Dense(num_classes, activation='softmax'))
 
         self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
+                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0005),
                            metrics=['accuracy'],
                            )
 

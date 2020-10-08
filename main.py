@@ -1,50 +1,60 @@
 import tensorflow as tf
 
-from Train_Utility import fix_gpu
+from Train_Utility import fix_gpu, train_dev_test
 from Train_Utility import generate_generator_multiple
 from Train_Utility import generate_test_generator_multiple
-from Train_Utility import generate_train_dev_test
 from Train_Utility import train_model
 from models.EnsembleModel import EnsembleModel
+from models.InceptionV4 import InceptionV4
+from models.Resnet50 import Resnet50
+from models.Resnet50_vggface import Resnet50_VGGFACE
+from models.Senet50_vggface import Senet50_VGGFACE
+from models.XCeption import XCeption
 
 target_size = 197
 
 fix_gpu()
 tf.get_logger().setLevel('ERROR')
 
-train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size)
+train, val, test = train_dev_test(target_size, batch_size=32)
+# mymodel = MobileNet(target_size)
+# train_model(mymodel, 'MobileNet Model', train, val, 20)
 
-train_generator = generate_generator_multiple(datagen, 'training', target_size)
-validation_generator = generate_generator_multiple(datagen, 'validation', target_size)
-test_generator = generate_test_generator_multiple(datagen_dev, target_size)
-
-# mymodel = Senet50_VGGFACE(target_size)
-# train_model(mymodel, 'Senet-VGGFACE', train, val)
+# train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, inception_resnet_v2.preprocess_input)
+mymodel = InceptionV4(target_size)
+train_model(mymodel, 'Inception Model', train, val, 10)
 #
-# mymodel = Resnet50_VGGFACE(target_size)
-# train_model(mymodel, 'Resnet50-VGGFACE', train, val)
-
+# train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, resnet_v2.preprocess_input,32)
+mymodel = Resnet50(target_size)
+train_model(mymodel, 'Resnet Model', train, val, 10)
+#
+#
+# train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, xception.preprocess_input,8)
+mymodel = XCeption(target_size)
+train_model(mymodel, 'Xception Model', train, val, 10)
+#
+# train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size)
+#
+mymodel = Senet50_VGGFACE(target_size)
+train_model(mymodel, 'Senet-VGGFACE', train, val, 10)
+#
+mymodel = Resnet50_VGGFACE(target_size)
+train_model(mymodel, 'Resnet50-VGGFACE', train, val, 10)
+#
 # mymodel = VGG16_VGGFACE(target_size)
-# train_model(mymodel, 'VGG16-VGGFACE', train, val)
-
+# train_model(mymodel, 'VGG16-VGGFACE', train, val, 35)
+#
 # mymodel = Simple_ExpertNet(target_size)
-# train_model(mymodel, 'ExpertNet', train, val)
+# train_model(mymodel, 'ExpertNet', train, val, 30)
 #
 # mymodel = MyModel(target_size)
-# train_model(mymodel, 'My Model', train, val)
+# train_model(mymodel, 'My Model', train, val, 40)
 
-# mymodel = MobileNet(target_size)
-# train_model(mymodel, 'MobileNet Model', train, val)
 
-# mymodel = InceptionV4(target_size)
-# train_model(mymodel, 'Inception Model', train, val)
-
-# mymodel = Resnet50(target_size)
-# train_model(mymodel, 'Resnet Model', train, val)
-
-# mymodel = XCeption(target_size)
-# train_model(mymodel, 'Xception Model', train, val)
+train_generator = generate_generator_multiple('train', target_size)
+validation_generator = generate_generator_multiple('val', target_size)
+test_generator = generate_test_generator_multiple(target_size)
 
 mymodel = EnsembleModel(target_size)
 train_model(mymodel, "Ensemble", train_generator, test_generator)
-mymodel.model.evaluate(test_generator, steps=len(test.filenames) / 16)
+# mymodel.model.evaluate(test_generator, steps=len(test.filenames) / 16)

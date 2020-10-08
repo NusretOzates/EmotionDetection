@@ -19,7 +19,7 @@ class Senet50_VGGFACE:
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
 
         DROPOUT_RATE = 0.5
-        FROZEN_LAYER_NUM = 201
+        FROZEN_LAYER_NUM = 180
 
         vgg_notop = VGGFace(model='senet50', include_top=False, input_shape=(target_size, target_size, 3),
                             pooling='avg')
@@ -44,6 +44,7 @@ class Senet50_VGGFACE:
 
         self.model.load_weights(self.checkpoint_path)
 
+
         self.model.compile(loss='categorical_crossentropy',
                            optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
                            metrics=['accuracy'],
@@ -55,13 +56,16 @@ class Senet50_VGGFACE:
         # Create a callback that saves the model's weights
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                          save_weights_only=True,
-                                                         save_best_only=False,
+                                                         save_best_only=True,
                                                          verbose=0)
+        log_dir = "logs/fit/senet50_vgg"
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
         history = self.model.fit(x=train_dataset,
                                  validation_data=validation_dataset,
                                  epochs=epochs,
                                  verbose=1,
-                                 callbacks=[cp_callback]
+                                 callbacks=[cp_callback, tensorboard_callback]
                                  )
         return history
 

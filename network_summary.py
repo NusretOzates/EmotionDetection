@@ -1,4 +1,4 @@
-import tensorflow as tf
+from keras_vggface import VGGFace
 
 from Train_Utility import fix_gpu
 
@@ -8,14 +8,6 @@ from Train_Utility import fix_gpu
 
 fix_gpu()
 
-mymodel = tf.keras.applications.ResNet50V2(include_top=False, input_shape=(128, 128, 3), weights='imagenet')
-print(len(mymodel.layers))
-
-mymodel = tf.keras.applications.InceptionResNetV2(include_top=False, input_shape=(128, 128, 3), weights='imagenet')
-print(len(mymodel.layers))
-
-mymodel = tf.keras.applications.MobileNetV2(include_top=False, input_shape=(128, 128, 3), weights='imagenet')
-print(len(mymodel.layers))
-
-mymodel = tf.keras.applications.Xception(include_top=False, input_shape=(128, 128, 3), weights='imagenet')
+mymodel = VGGFace(model='vgg16', include_top=False, input_shape=(197, 197, 3),
+                  pooling='avg')
 print(len(mymodel.layers))

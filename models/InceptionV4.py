@@ -2,6 +2,7 @@ import os
 
 import tensorflow as tf
 from tensorflow.keras.layers import *
+from tensorflow.python.keras.regularizers import l2
 
 
 class InceptionV4:
@@ -26,11 +27,11 @@ class InceptionV4:
             self.net,
             Flatten(),
             Dropout(0.3),
-            Dense(512, activation='relu', name='Last_Layer5'),
+            Dense(512, activation='relu', name='Last_Layer5', kernel_regularizer=l2(l=0.001)),
             tf.keras.layers.Dense(7, activation='softmax')
         ])
 
-        self.model.load_weights(self.checkpoint_path)
+        # self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
                            optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
