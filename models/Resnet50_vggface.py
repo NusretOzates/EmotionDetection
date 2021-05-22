@@ -25,10 +25,6 @@ class Resnet50_VGGFACE:
         last_layer = vgg_notop.get_layer('avg_pool').output
         x = Flatten(name='flatten')(last_layer)
         x = Dropout(DROPOUT_RATE)(x)
-        x = Dense(4096, activation='relu', name='fc6')(x)
-        x = Dropout(DROPOUT_RATE)(x)
-        x = Dense(1024, activation='relu', name='Last_Layer')(x)
-        x = Dropout(DROPOUT_RATE)(x)
 
         batch_norm_indices = [2, 6, 9, 13, 14, 18, 21, 24, 28, 31, 34, 38, 41, 45, 46, 53, 56, 60, 63, 66, 70, 73, 76,
                               80, 83, 87, 88, 92, 95, 98, 102, 105, 108, 112, 115, 118, 122, 125, 128, 132, 135, 138,

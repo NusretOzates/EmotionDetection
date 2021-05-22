@@ -1,3 +1,4 @@
+import math
 import os
 
 import tensorflow as tf
@@ -8,7 +9,7 @@ from tensorflow.python.keras.regularizers import l2
 
 class MobileNet:
 
-    def __init__(self, target_size):
+    def __init__(self, target_size, train_length):
         self.checkpoint_path = "model_weights/mobilenet_training_1/cp.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
 
@@ -28,37 +29,67 @@ class MobileNet:
         )
 
         inputs = layers.Input(shape=(target_size, target_size, 3))
-        x = img_augmentation(inputs)
+        X = img_augmentation(inputs)
 
-        self.net = tf.keras.applications.MobileNetV2(input_tensor=x,
+        self.net = tf.keras.applications.MobileNetV2(input_tensor=X,
                                                      include_top=False,
                                                      weights='imagenet'
                                                      )
-        self.net.trainable = True
-        # Fine tune from this layer onwards
-        fine_tune_at = 50
 
-        # Freeze all the layers before the `fine_tune_at` layer
-        for layer in self.net.layers[:-fine_tune_at]:
+        # Apply image detector on a single image.
+        detector: tf.keras.Model = hub.load("https://tfhub.dev/tensorflow/ssd_mobilenet_v2/2")
+        output = detector.output
+        X = GlobalAveragePooling2D()(output)
+        X = Dense(7)(X)
+
+        m = Model(detector.inputs, X)
+        m.compile()
+
+        for layer in self.net.layers:
             layer.trainable = False
 
-        last_layer = self.net.get_layer('out_relu')
-        last_output = last_layer.output
-        x = Flatten()(last_output)
-        x = Dropout(0.3)(x)
-        x = Dense(512, activation='relu', kernel_regularizer=l2(l=0.001), name='Last_Layer4')(x)
-        x = Dense(7, activation='softmax')(x)
+        # Fine tune from this layer onwards
+        fine_tune_at = len(self.net.layers) * 20 // 100
+        print(fine_tune_at)
+        # Freeze all the layers before the `fine_tune_at` layer
+        for layer in self.net.layers[:fine_tune_at]:
+            layer.trainable = False
+        for layer in self.net.layers[fine_tune_at:]:
+            layer.trainable = True
 
-        self.model = Model(self.net.input, x)
+        last_output = self.net.output
+        X = GlobalAveragePooling2D()(last_output)
 
-        self.model.load_weights(self.checkpoint_path)
+        X = self.create_attention(X, X, X)
+        X = self.create_attention(X, X, X)
+
+        X = Dense(7)(X)
+        X = Activation('softmax', dtype='float32')(X)
+
+        self.model = Model(self.net.input, X)
+
+        # self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
-                           optimizer=tf.keras.optimizers.Adamax(learning_rate=0.0001),
+                           optimizer=tf.keras.optimizers.SGD(nesterov=True),
                            metrics=['accuracy'],
                            )
 
         print(self.model.summary())
+
+    def create_attention(self, X, key, value):
+        K = MultiHeadAttention(8, X.shape[1], attention_axes=1)(key, value)
+
+        X = Add()([X, K])
+        add_norm_1 = LayerNormalization()(X)
+
+        # C = Concatenate(axis=-1)([X, Y, Z])
+        X = Dense(X.shape[1], activation='elu')(add_norm_1)
+        X = Add()([X, add_norm_1])
+        X = LayerNormalization()(X)
+
+        X = Dense(512, activation='elu')(X)
+        return X
 
     def train(self, epochs, train_dataset, validation_dataset):
         # Create a callback that saves the model's weights
@@ -68,10 +99,20 @@ class MobileNet:
                                                          verbose=0)
         log_dir = "logs/fit/mobilenet"
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
         history = self.model.fit(x=train_dataset,
                                  validation_data=validation_dataset,
                                  epochs=epochs,
                                  verbose=1,
-                                 callbacks=[cp_callback, tensorboard_callback]
+                                 callbacks=[cp_callback, tensorboard_callback],
+                                 class_weight={
+                                     0: 3,
+                                     1: 8,
+                                     2: 3,
+                                     3: 1,
+                                     4: 2.6,
+                                     5: 2.6,
+                                     6: 3.4
+                                 }
                                  )
         return history

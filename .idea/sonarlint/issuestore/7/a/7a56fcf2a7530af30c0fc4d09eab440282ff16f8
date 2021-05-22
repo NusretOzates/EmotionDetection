@@ -1,0 +1,5 @@
+
+lpython:S101	"URename class "Simple_ExpertNet" to match the regular expression ^[A-Z_][a-zA-Z0-9]+$.(Ë»ı
+cpython:S100"MRename method "exFeat" to match the regular expression ^[a-z_][a-z0-9_]{2,}$.(¥ğÛ)
+_python:S2208"GImport only needed names or import the module and then use its members.(€‘Ñê
+Hpython:S5806"+Rename this variable; it shadows a builtin.(¶÷«¿ûÿÿÿÿ

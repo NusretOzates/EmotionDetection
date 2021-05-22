@@ -3,3 +3,7 @@ venv/
 data.7z
 test_pictures/
 model_weights/
+model_weights
+/logs/
+.idea
+.idea/

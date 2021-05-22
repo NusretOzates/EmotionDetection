@@ -5,5 +5,7 @@ Pillow>=7.0.0
 matplotlib>=3.2.2
 deepface>=0.0.33
 autocrop>=1.0.2
-scikit-learn>=0.23.1
+scikit-learn>=0.23.2
+keras_applications >= 1.0.8
+keras_vggface>=0.6
 

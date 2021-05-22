@@ -1,0 +1,22 @@
+
+npython:S117±"VRename this local variable "genX4" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ù‚ò¦
+spython:S117º"VRename this local variable "genX5" to match the regular expression ^[_a-z][a-z0-9_]*$.(²ñè´ÿÿÿÿÿ
+qpython:S117Æ"TRename this local variable "X3i" to match the regular expression ^[_a-z][a-z0-9_]*$.(Õ„Øıÿÿÿÿ
+qpython:S117ú"TRename this local variable "X1i" to match the regular expression ^[_a-z][a-z0-9_]*$.(€½àÀüÿÿÿÿ
+lpython:S117û"TRename this local variable "X2i" to match the regular expression ^[_a-z][a-z0-9_]*$.(îÆ¾
+lpython:S117ı"TRename this local variable "X4i" to match the regular expression ^[_a-z][a-z0-9_]*$.(Õ³È±
+qpython:S117Ä"TRename this local variable "X1i" to match the regular expression ^[_a-z][a-z0-9_]*$.(€½àÀüÿÿÿÿ
+spython:S117Î"VRename this local variable "genX1" to match the regular expression ^[_a-z][a-z0-9_]*$.(ùçäÿÿÿÿÿ
+lpython:S117Ç"TRename this local variable "X4i" to match the regular expression ^[_a-z][a-z0-9_]*$.(Õ³È±
+mpython:S117¨"VRename this local variable "genX3" to match the regular expression ^[_a-z][a-z0-9_]*$.(¿àß#
+qpython:S117ş"TRename this local variable "X5i" to match the regular expression ^[_a-z][a-z0-9_]*$.(¶–Ôïÿÿÿÿÿ
+spython:S117×"VRename this local variable "genX2" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÒÍÕùÿÿÿÿ
+lpython:S117Å"TRename this local variable "X2i" to match the regular expression ^[_a-z][a-z0-9_]*$.(îÆ¾
+qpython:S117ü"TRename this local variable "X3i" to match the regular expression ^[_a-z][a-z0-9_]*$.(Õ„Øıÿÿÿÿ
+spython:S117ğ"VRename this local variable "genX5" to match the regular expression ^[_a-z][a-z0-9_]*$.(²ñè´ÿÿÿÿÿ
+spython:S117–"VRename this local variable "genX1" to match the regular expression ^[_a-z][a-z0-9_]*$.(ùçäÿÿÿÿÿ
+mpython:S117à"VRename this local variable "genX3" to match the regular expression ^[_a-z][a-z0-9_]*$.(¿àß#
+dpython:S1192—"FDefine a constant instead of duplicating this literal 'data/' 5 times.(¤Š€¢ùÿÿÿÿ
+qpython:S117È"TRename this local variable "X5i" to match the regular expression ^[_a-z][a-z0-9_]*$.(¶–Ôïÿÿÿÿÿ
+spython:S117Ÿ"VRename this local variable "genX2" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÒÍÕùÿÿÿÿ
+npython:S117è"VRename this local variable "genX4" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ù‚ò¦

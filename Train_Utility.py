@@ -5,6 +5,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 DATA_TEST = 'data/test'
 
 
+
 def train_model(model, name, train_data, val_data, epochs=10):
     history = model.train(
         epochs=epochs,
@@ -19,14 +20,14 @@ def train_model(model, name, train_data, val_data, epochs=10):
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
     plt.show()
-    # summarize history for loss
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title(name + ' model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
+    # # summarize history for loss
+    # plt.plot(history.history['loss'])
+    # plt.plot(history.history['val_loss'])
+    # plt.title(name + ' model loss')
+    # plt.ylabel('loss')
+    # plt.xlabel('epoch')
+    # plt.legend(['train', 'test'], loc='upper left')
+    # plt.show()
 
 
 def generate_train_dev_test(target_size, preprocessing_function=None, batch_size=16):
@@ -88,6 +89,7 @@ def get_data(batch_size, data_train, data_val, datagen, datagen_dev, datagen_tes
         interpolation='hamming',
         shuffle=False
     )
+
     val = datagen_dev.flow_from_directory(
         data_val,
         target_size=(target_size, target_size),
@@ -139,9 +141,9 @@ def train_dev_test(target_size, batch_size=16):
     # val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
     # test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
-    train_ds = train_ds.prefetch(buffer_size=AUTOTUNE)
-    val_ds = val_ds.prefetch(buffer_size=AUTOTUNE)
-    test_ds = test_ds.prefetch(buffer_size=AUTOTUNE)
+    train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
+    val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+    test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
     return train_ds, val_ds, test_ds
 

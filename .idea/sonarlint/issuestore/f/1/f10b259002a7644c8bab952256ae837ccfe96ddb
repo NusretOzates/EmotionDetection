@@ -1,0 +1,6 @@
+
+qpython:S100H"URename method "showActivation" to match the regular expression ^[a-z_][a-z0-9_]{2,}$.(ïûğ¦ÿÿÿÿÿ
+;python:S125	"Remove this commented out code.(…®Æüÿÿÿÿ
+_python:S2208"GImport only needed names or import the module and then use its members.(€‘Ñê
+kpython:S101"TRename class "Senet50_VGGFACE" to match the regular expression ^[A-Z_][a-zA-Z0-9]+$.(ûõ 
+6python:S125"Remove this commented out code.(é”ñ‰

@@ -1,0 +1,6 @@
+
+_python:S2208"GImport only needed names or import the module and then use its members.(€‘Ñê
+qpython:S101"URename class "Resnet50_VGGFACE" to match the regular expression ^[A-Z_][a-zA-Z0-9]+$.(ô°³Ëùÿÿÿÿ
+;python:S125	"Remove this commented out code.(…®Æüÿÿÿÿ
+6python:S125"Remove this commented out code.(é”ñ‰
+qpython:S100F"URename method "showActivation" to match the regular expression ^[a-z_][a-z0-9_]{2,}$.(ïûğ¦ÿÿÿÿÿ

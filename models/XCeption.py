@@ -25,7 +25,6 @@ class XCeption:
             self.net,
             Flatten(),
             Dropout(0.3),
-            Dense(512, activation='relu', name='Last_Layer7'),
             tf.keras.layers.Dense(7, activation='softmax')
         ])
 

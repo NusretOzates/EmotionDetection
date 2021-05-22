@@ -1,3 +1,4 @@
+from keras.applications import NASNetLarge
 from keras_vggface import VGGFace
 
 from Train_Utility import fix_gpu
@@ -8,6 +9,6 @@ from Train_Utility import fix_gpu
 
 fix_gpu()
 
-mymodel = VGGFace(model='vgg16', include_top=False, input_shape=(197, 197, 3),
-                  pooling='avg')
-print(len(mymodel.layers))
+mymodel = NASNetLarge(include_top=False, input_shape=(331, 331, 3), weights='imagenet')
+for i, layer in enumerate(mymodel.layers):
+   print(i, layer.name)

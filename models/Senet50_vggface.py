@@ -26,10 +26,6 @@ class Senet50_VGGFACE:
         last_layer = vgg_notop.get_layer('avg_pool').output
         x = Flatten(name='flatten')(last_layer)
         x = Dropout(DROPOUT_RATE)(x)
-        x = Dense(4096, activation='relu', name='fc6')(x)
-        x = Dropout(DROPOUT_RATE)(x)
-        x = Dense(1024, activation='relu', name='Last_Layer12')(x)
-        x = Dropout(DROPOUT_RATE)(x)
 
         batch_norm_indices = [2, 6, 9, 12, 21, 25, 28, 31, 42, 45, 48, 59, 62, 65, 74, 78, 81, 84, 95, 98, 101, 112,
                               115, 118, 129, 132, 135, 144, 148, 151, 154, 165, 168, 171, 182, 185, 188, 199, 202, 205,
