@@ -1,4 +1,5 @@
 import os
+
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras import layers
@@ -47,9 +48,6 @@ class InceptionV4:
         last_output = self.net.output
         X = GlobalAveragePooling2D()(last_output)
 
-        X = self.create_attention(X, X, X)
-        X = self.create_attention(X, X, X)
-
         X = Dense(7)(X)
         X = Activation('softmax', dtype='float32')(X)
 
@@ -63,20 +61,6 @@ class InceptionV4:
                            )
 
         print(self.model.summary())
-
-    def create_attention(self, X, key, value):
-        K = MultiHeadAttention(8, X.shape[1], attention_axes=1)(key, value)
-
-        X = Add()([X, K])
-        add_norm_1 = LayerNormalization()(X)
-
-        # C = Concatenate(axis=-1)([X, Y, Z])
-        X = Dense(X.shape[1], activation='elu')(add_norm_1)
-        X = Add()([X, add_norm_1])
-        X = LayerNormalization()(X)
-
-        X = Dense(512, activation='elu')(X)
-        return X
 
     def train(self, epochs, train_dataset, validation_dataset):
         # Create a callback that saves the model's weights
@@ -94,17 +78,3 @@ class InceptionV4:
                                  callbacks=[cp_callback, tensorboard_callback]
                                  )
         return history
-
-    def showActivation(self):
-        from tensorflow.keras.preprocessing import image
-        import numpy as np
-        from keract import get_activations, display_heatmaps
-        img = image.load_img('test_pictures/nusret.png', target_size=(196, 196))
-        arr = image.img_to_array(img)
-        arr /= 255.0
-        arr = np.expand_dims(arr, axis=0)
-        images = np.vstack([arr])
-
-        keract_inputs = images
-        activations = get_activations(self.model, keract_inputs)
-        display_heatmaps(activations, keract_inputs, save=False)

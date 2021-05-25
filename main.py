@@ -2,17 +2,8 @@ import tensorflow as tf
 from tensorflow.keras import mixed_precision
 
 from Train_Utility import fix_gpu, train_dev_test
-from Train_Utility import generate_generator_multiple
-from Train_Utility import generate_test_generator_multiple
 from Train_Utility import train_model
-from models.EnsembleModel import EnsembleModel
-from models.InceptionV4 import InceptionV4
 from models.MobileNet import MobileNet
-from models.NasNetLarge import NasnetLarge
-from models.Resnet50 import Resnet50
-from models.Resnet50_vggface import Resnet50_VGGFACE
-from models.Senet50_vggface import Senet50_VGGFACE
-from models.XCeption import XCeption
 
 fix_gpu()
 policy = mixed_precision.Policy('mixed_float16')
@@ -30,7 +21,7 @@ train, val, test = train_dev_test(target_size, batch_size=64)
 # mymodel = NasnetLarge(target_size)
 # train_model(mymodel, 'Nasnet Large Model', train, val, 30)
 
-mymodel = MobileNet(target_size, len(train))
+mymodel = MobileNet(target_size)
 train_model(mymodel, 'MobileNet Model', train, val, 10)
 
 # train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, inception_resnet_v2.preprocess_input)

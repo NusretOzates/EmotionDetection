@@ -1,21 +1,18 @@
-import math
 import os
 
 import tensorflow as tf
 from tensorflow.keras import Model
+from tensorflow.keras import layers
 from tensorflow.keras.layers import *
-from tensorflow.python.keras.regularizers import l2
+from tensorflow.keras.layers.experimental import preprocessing
+from tensorflow.keras.models import Sequential
 
 
 class MobileNet:
 
-    def __init__(self, target_size, train_length):
+    def __init__(self, target_size):
         self.checkpoint_path = "model_weights/mobilenet_training_1/cp.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
-
-        from tensorflow.keras.layers.experimental import preprocessing
-        from tensorflow.keras.models import Sequential
-        from tensorflow.keras import layers
 
         img_augmentation = Sequential(
             [
@@ -36,14 +33,6 @@ class MobileNet:
                                                      weights='imagenet'
                                                      )
 
-        # Apply image detector on a single image.
-        detector: tf.keras.Model = hub.load("https://tfhub.dev/tensorflow/ssd_mobilenet_v2/2")
-        output = detector.output
-        X = GlobalAveragePooling2D()(output)
-        X = Dense(7)(X)
-
-        m = Model(detector.inputs, X)
-        m.compile()
 
         for layer in self.net.layers:
             layer.trainable = False
@@ -60,9 +49,6 @@ class MobileNet:
         last_output = self.net.output
         X = GlobalAveragePooling2D()(last_output)
 
-        X = self.create_attention(X, X, X)
-        X = self.create_attention(X, X, X)
-
         X = Dense(7)(X)
         X = Activation('softmax', dtype='float32')(X)
 
@@ -77,19 +63,6 @@ class MobileNet:
 
         print(self.model.summary())
 
-    def create_attention(self, X, key, value):
-        K = MultiHeadAttention(8, X.shape[1], attention_axes=1)(key, value)
-
-        X = Add()([X, K])
-        add_norm_1 = LayerNormalization()(X)
-
-        # C = Concatenate(axis=-1)([X, Y, Z])
-        X = Dense(X.shape[1], activation='elu')(add_norm_1)
-        X = Add()([X, add_norm_1])
-        X = LayerNormalization()(X)
-
-        X = Dense(512, activation='elu')(X)
-        return X
 
     def train(self, epochs, train_dataset, validation_dataset):
         # Create a callback that saves the model's weights

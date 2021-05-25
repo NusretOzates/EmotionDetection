@@ -12,8 +12,7 @@ class Resnet50:
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
 
         self.net = tf.keras.applications.ResNet50V2(input_shape=(target_size, target_size, 3),
-                                                    include_top=False,
-
+                                                    include_top=False
                                                     )
         self.net.trainable = True
         # Fine tune from this layer onwards
