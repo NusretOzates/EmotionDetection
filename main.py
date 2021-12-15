@@ -6,11 +6,12 @@ from Train_Utility import train_model
 from models.MobileNet import MobileNet
 
 fix_gpu()
-policy = mixed_precision.Policy('mixed_float16')
-mixed_precision.set_global_policy(policy)
+# only uncomment if you use Nvida gpu
+# policy = mixed_precision.Policy('mixed_float16')
+# mixed_precision.set_global_policy(policy)
 
-print('Compute dtype: %s' % policy.compute_dtype)
-print('Variable dtype: %s' % policy.variable_dtype)
+# print('Compute dtype: %s' % policy.compute_dtype)
+# print('Variable dtype: %s' % policy.variable_dtype)
 
 target_size = 48
 

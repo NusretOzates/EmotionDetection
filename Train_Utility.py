@@ -1,16 +1,20 @@
+import typing
+
 import tensorflow as tf
 from matplotlib import pyplot as plt
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing import image_dataset_from_directory
+from models import BaseModel
 
 DATA_TEST = 'data/test'
 
 
-
-def train_model(model, name, train_data, val_data, epochs=10):
+def train_model(model: BaseModel, name, train_data, val_data, epochs=10):
     history = model.train(
         epochs=epochs,
-        train_dataset=train_data,
-        validation_dataset=val_data,
+        train=train_data,
+        validation=val_data,
+        name=name
     )
 
     plt.plot(history.history['accuracy'])
@@ -109,22 +113,22 @@ def get_data(batch_size, data_train, data_val, datagen, datagen_dev, datagen_tes
     return train, val, test, datagen, datagen_dev
 
 
-def train_dev_test(target_size, batch_size=16):
-    train_ds = tf.keras.preprocessing.image_dataset_from_directory(
+def train_dev_test(target_size: int, batch_size=16) -> typing.List[tf.data.Dataset]:
+    train_ds = image_dataset_from_directory(
         'data/train',
         label_mode='categorical',
         seed=123,
         image_size=(target_size, target_size),
         batch_size=batch_size)
 
-    val_ds = tf.keras.preprocessing.image_dataset_from_directory(
+    val_ds = image_dataset_from_directory(
         'data/val',
         label_mode='categorical',
         seed=123,
         image_size=(target_size, target_size),
         batch_size=batch_size)
 
-    test_ds = tf.keras.preprocessing.image_dataset_from_directory(
+    test_ds = image_dataset_from_directory(
         'data/test',
         label_mode='categorical',
         seed=123,
@@ -145,13 +149,13 @@ def train_dev_test(target_size, batch_size=16):
     val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
     test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
-    return train_ds, val_ds, test_ds
+    return [train_ds, val_ds, test_ds]
 
 
 def generate_generator_multiple(subset, target_size):
     AUTOTUNE = tf.data.experimental.AUTOTUNE
 
-    genX1 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX1 = image_dataset_from_directory(
         'data/' + subset,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -160,7 +164,7 @@ def generate_generator_multiple(subset, target_size):
         seed=7
     ).prefetch(buffer_size=AUTOTUNE)
 
-    genX2 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX2 = image_dataset_from_directory(
         'data/' + subset,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -169,7 +173,7 @@ def generate_generator_multiple(subset, target_size):
         seed=7
     ).prefetch(buffer_size=AUTOTUNE)
 
-    genX3 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX3 = image_dataset_from_directory(
         'data/' + subset,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -178,7 +182,7 @@ def generate_generator_multiple(subset, target_size):
         seed=7
     ).prefetch(buffer_size=AUTOTUNE)
 
-    genX4 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX4 = image_dataset_from_directory(
         'data/' + subset,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -187,7 +191,7 @@ def generate_generator_multiple(subset, target_size):
         seed=7
     ).prefetch(buffer_size=AUTOTUNE)
 
-    genX5 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX5 = image_dataset_from_directory(
         'data/' + subset,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -208,7 +212,7 @@ def generate_generator_multiple(subset, target_size):
 
 def generate_test_generator_multiple(target_size):
     AUTOTUNE = tf.data.experimental.AUTOTUNE
-    genX1 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX1 = image_dataset_from_directory(
         DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -217,7 +221,7 @@ def generate_test_generator_multiple(target_size):
         seed=7
     ).prefetch(buffer_size=AUTOTUNE)
 
-    genX2 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX2 = image_dataset_from_directory(
         DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -226,7 +230,7 @@ def generate_test_generator_multiple(target_size):
         seed=7
     ).prefetch(buffer_size=AUTOTUNE)
 
-    genX3 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX3 = image_dataset_from_directory(
         DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -234,7 +238,7 @@ def generate_test_generator_multiple(target_size):
         interpolation='hamming',
         seed=7
     ).prefetch(buffer_size=AUTOTUNE)
-    genX4 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX4 = image_dataset_from_directory(
         DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -242,7 +246,7 @@ def generate_test_generator_multiple(target_size):
         interpolation='hamming',
         seed=7
     ).prefetch(buffer_size=AUTOTUNE)
-    genX5 = tf.keras.preprocessing.image_dataset_from_directory(
+    genX5 = image_dataset_from_directory(
         DATA_TEST,
         target_size=(target_size, target_size),
         batch_size=8,
@@ -261,7 +265,7 @@ def generate_test_generator_multiple(target_size):
         yield [X1i[0], X2i[0], X3i[0], X4i[0], X5i[0]], X2i[1]  # Yield both images and their mutual label
 
 
-def generat_labels(train):
+def generate_labels(train):
     labels = '\n'.join(sorted(train.class_indices.keys()))
 
     with open('labels.txt', 'w') as f:
