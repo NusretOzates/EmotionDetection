@@ -1,25 +1,30 @@
 import os
-
+import numpy as np
 import tensorflow as tf
+
 from tensorflow.keras.layers import *
+from models.BaseModel import BaseModel
+from utils import *
+from tensorflow.keras.preprocessing import image
+from keract import get_activations, display_heatmaps
 
 
-class XCeption:
+class XCeption(BaseModel):
 
-    def __init__(self,target_size):
+    def __init__(self, target_size):
         self.checkpoint_path = "model_weights/xception_training_1/cp.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
-        self.net = tf.keras.applications.Xception(input_shape=(target_size, target_size, 3),
+
+        img_augmentation = image_augmentation_model()
+
+        inputs = Input(shape=(target_size, target_size, 3))
+        x = img_augmentation(inputs)
+
+        self.net = tf.keras.applications.Xception(input_tensor=x,
                                                   include_top=False,
                                                   )
 
-        self.net.trainable = True
-        # Fine tune from this layer onwards
-        fine_tune_at = 65
-
-        # Freeze all the layers before the `fine_tune_at` layer
-        for layer in self.net.layers[:fine_tune_at]:
-            layer.trainable = False
+        self.net = freeze_first_n_percent(self.net, 100)
 
         self.model = tf.keras.Sequential([
             self.net,
@@ -35,28 +40,7 @@ class XCeption:
                            metrics=['accuracy'],
                            )
 
-    def train(self, epochs, train_dataset, validation_dataset):
-        # Create a callback that saves the model's weights
-        cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
-                                                         save_weights_only=True,
-                                                         save_best_only=True,
-                                                         verbose=0)
-
-        log_dir = "logs/fit/xception"
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-
-        history = self.model.fit(x=train_dataset,
-                                 validation_data=validation_dataset,
-                                 epochs=epochs,
-                                 verbose=1,
-                                 callbacks=[cp_callback, tensorboard_callback]
-                                 )
-        return history
-
-    def showActivation(self):
-        from tensorflow.keras.preprocessing import image
-        import numpy as np
-        from keract import get_activations, display_heatmaps
+    def show_activation(self):
         img = image.load_img('test_pictures/nusret.png', target_size=(197, 197))
         arr = image.img_to_array(img)
         arr /= 255.0

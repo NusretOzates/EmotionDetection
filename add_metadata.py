@@ -1,35 +1,14 @@
 import os
-
-import numpy as np
 import tensorflow as tf
-from tensorflow.keras.preprocessing import image
 from tflite_support import flatbuffers
 from tflite_support import metadata as _metadata
 from tflite_support import metadata_schema_py_generated as _metadata_fb
 
 from models.InceptionV4 import InceptionV4
 
-# net = tf.keras.applications.Xception(input_shape=(71, 71, 3),
-#                                   include_top=False,
-#                                   )
-# print(net.summary())
-# last_layer = net.get_layer('post_relu').output
-
 emotion_labels = ["Angry", "Disgust", "Fear", "Happy", "Neutral", "Sad", "Surprise"]
 
-img = image.load_img('test_pictures/nusret.png', target_size=(160, 160))
-arr = image.img_to_array(img)
-arr /= 255.0
-arr = np.expand_dims(arr, axis=0)
-images = np.vstack([arr])
-
-mymodel = InceptionV4()  # %70 accuracy max
-# classes = mymodel.model.predict(images, batch_size=10)
-# print(classes)
-# print(emotion_labels[np.argmax(classes)])
-# print(len(mymodel.net.layers))
-
-
+mymodel = InceptionV4(160)  # %70 accuracy max
 mymodel.model.save('inceptionv4/inceptionv4')
 converter = tf.lite.TFLiteConverter.from_saved_model('inceptionv4/inceptionv4')
 converter.optimizations = [tf.lite.Optimize.DEFAULT]
@@ -61,13 +40,10 @@ input_meta.description = (
     "tensor is a single byte between 0 and 255.".format(160, 160))
 input_meta.content = _metadata_fb.ContentT()
 input_meta.content.contentProperties = _metadata_fb.ImagePropertiesT()
-input_meta.content.contentProperties.colorSpace = (
-    _metadata_fb.ColorSpaceType.RGB)
-input_meta.content.contentPropertiesType = (
-    _metadata_fb.ContentProperties.ImageProperties)
+input_meta.content.contentProperties.colorSpace = _metadata_fb.ColorSpaceType.RGB
+input_meta.content.contentPropertiesType = _metadata_fb.ContentProperties.ImageProperties
 input_normalization = _metadata_fb.ProcessUnitT()
-input_normalization.optionsType = (
-    _metadata_fb.ProcessUnitOptions.NormalizationOptions)
+input_normalization.optionsType = _metadata_fb.ProcessUnitOptions.NormalizationOptions
 input_normalization.options = _metadata_fb.NormalizationOptionsT()
 input_normalization.options.mean = [127.5]
 input_normalization.options.std = [127.5]
@@ -83,8 +59,7 @@ output_meta.name = "probability"
 output_meta.description = "Probabilities of the 7 labels respectively."
 output_meta.content = _metadata_fb.ContentT()
 output_meta.content.content_properties = _metadata_fb.FeaturePropertiesT()
-output_meta.content.contentPropertiesType = (
-    _metadata_fb.ContentProperties.FeatureProperties)
+output_meta.content.contentPropertiesType = _metadata_fb.ContentProperties.FeatureProperties
 output_stats = _metadata_fb.StatsT()
 output_stats.max = [1.0]
 output_stats.min = [0.0]
@@ -107,10 +82,7 @@ b.Finish(
     _metadata.MetadataPopulator.METADATA_FILE_IDENTIFIER)
 metadata_buf = b.Output()
 
-
 populator = _metadata.MetadataPopulator.with_model_file('inception_model.tflite')
 populator.load_metadata_buffer(metadata_buf)
 populator.load_associated_files(["labels.txt"])
 populator.populate()
-
-

@@ -35,7 +35,7 @@ class MobileNet(BaseModel):
 
         self.model = Model(self.net.input, X)
 
-        self.model.load_weights(self.checkpoint_path)
+        # self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
                            optimizer=tf.keras.optimizers.Adam(),

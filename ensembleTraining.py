@@ -1,27 +1,24 @@
 import numpy as np
 from sklearn.metrics import accuracy_score
-
-from Train_Utility import generate_train_dev_test
+from train_utility import generate_train_dev_test
 from models.InceptionV4 import *
 from models.MobileNet import *
-from models.MyModel import MyModel
 from models.Resnet50 import Resnet50
 from models.Resnet50_vggface import Resnet50_VGGFACE
 from models.Senet50_vggface import Senet50_VGGFACE
-from models.Simple_ExpertNet import Simple_ExpertNet
 from models.VGG16_vggface import VGG16_VGGFACE
 from models.XCeption import *
+
+from tensorflow.keras.applications import mobilenet_v2
+from tensorflow.keras.applications import inception_resnet_v2
+from tensorflow.keras.applications import resnet_v2
+from tensorflow.keras.applications import xception
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
 session = tf.compat.v1.InteractiveSession(config=config)
 
 emotion_labels = ["Angry", "Disgust", "Fear", "Happy", "Neutral", "Sad", "Surprise"]
-
-from tensorflow.keras.applications import mobilenet_v2
-from tensorflow.keras.applications import inception_resnet_v2
-from tensorflow.keras.applications import resnet_v2
-from tensorflow.keras.applications import xception
 
 target_size = 197
 targetsize = 197
@@ -32,8 +29,6 @@ mobilenet = MobileNet(targetsize).model
 inception = InceptionV4(targetsize).model
 resnet50 = Resnet50(targetsize).model
 xception_model = XCeption(targetsize).model
-expert = Simple_ExpertNet(targetsize).model
-mymodel = MyModel(targetsize).model
 vgg16 = VGG16_VGGFACE(targetsize).model
 
 train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, mobilenet_v2.preprocess_input, 8)
@@ -49,7 +44,6 @@ train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, xc
 xceptiony = xception_model.predict(test)
 
 train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, batch_size=8)
-experty = expert.predict(test)
 vgg16y = vgg16.predict(test)
 resnet_vggy = resnet_vgg.predict(test)
 senet_vggy = senet_vgg.predict(test)
@@ -87,11 +81,6 @@ print('Xception Accuracy score is coming!')
 xception_model.evaluate(test)
 
 train, val, test, datagen, datagen_dev = generate_train_dev_test(target_size, batch_size=8)
-print('My Model Accuracy score is coming!')
-mymodel.evaluate(test)
-
-print('Expertnet Accuracy score is coming!')
-expert.evaluate(test)
 
 print('Resnet50-VGGFACE Accuracy score is coming!')
 resnet_vgg.evaluate(test)

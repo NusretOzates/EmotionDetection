@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras import layers
 from tensorflow.keras.layers import *
-from utils import image_augmentation_model, freeze_first_n_percent
+from .utils import image_augmentation_model, freeze_first_n_percent
 from models.BaseModel import BaseModel
 
 
