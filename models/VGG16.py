@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import *
 from tensorflow.python.keras.regularizers import l2
 from models.BaseModel import BaseModel
-from utils import *
+from .utils import *
 
 
 class VGG16(BaseModel):

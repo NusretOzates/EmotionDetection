@@ -1,7 +1,7 @@
 import os
 import tensorflow as tf
 from tensorflow.keras.layers import *
-from utils import *
+from .utils import *
 from models.BaseModel import BaseModel
 
 

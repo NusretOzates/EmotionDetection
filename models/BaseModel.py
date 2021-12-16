@@ -25,5 +25,6 @@ class BaseModel:
                                  epochs=epochs,
                                  verbose=1,
                                  callbacks=[cp_callback, tensorboard_callback],
+
                                  )
         return history

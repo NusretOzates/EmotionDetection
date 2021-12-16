@@ -1,8 +1,9 @@
 import os
 import tensorflow as tf
 from tensorflow.keras.layers import *
-from utils import *
+from .utils import *
 from models.BaseModel import BaseModel
+
 
 class NasnetLarge(BaseModel):
 
@@ -28,11 +29,12 @@ class NasnetLarge(BaseModel):
         x = GlobalAveragePooling2D()(last_layer)
         x = Flatten()(x)
         x = Dropout(0.3)(x)
-        x = Dense(7, activation='softmax')(x)
+        x = Dense(7)(x)
+        x = Activation(activation='softmax', dtype='float32')(x)
 
         self.model = Model(self.net.input, x)
 
-        self.model.load_weights(self.checkpoint_path)
+        # self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
                            optimizer='adam',

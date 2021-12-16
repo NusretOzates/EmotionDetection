@@ -4,7 +4,7 @@ import tensorflow as tf
 
 from tensorflow.keras.layers import *
 from models.BaseModel import BaseModel
-from utils import *
+from .utils import *
 from tensorflow.keras.preprocessing import image
 from keract import get_activations, display_heatmaps
 

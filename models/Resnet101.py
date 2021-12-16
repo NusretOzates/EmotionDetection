@@ -3,10 +3,10 @@ import os
 import tensorflow as tf
 from tensorflow.keras.layers import *
 from models.BaseModel import BaseModel
-from utils import *
+from .utils import *
 
 
-class Resnet50(BaseModel):
+class Resnet101(BaseModel):
 
     def __init__(self):
         self.checkpoint_path = "model_weights/resnet_101__training_1/cp.ckpt"

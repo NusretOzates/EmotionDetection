@@ -39,7 +39,7 @@ class MobileNet(BaseModel):
 
         self.model.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
                            optimizer=tf.keras.optimizers.Adam(),
-                           metrics=['accuracy'],
+                           metrics=['accuracy']
                            )
 
         self.model.summary()

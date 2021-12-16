@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 from tensorflow.keras.layers import *
 from models.BaseModel import BaseModel
-from utils import *
+from .utils import *
 
 
 class VGG19(BaseModel):
@@ -33,8 +33,8 @@ class VGG19(BaseModel):
             tf.keras.layers.Dense(7, activation='softmax')
         ])
 
-        print(self.model.summary())
-        self.model.load_weights(self.checkpoint_path)
+        self.model.summary()
+        #self.model.load_weights(self.checkpoint_path)
 
         self.model.compile(loss='categorical_crossentropy',
                            optimizer='adamax',
